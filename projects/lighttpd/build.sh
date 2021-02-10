@@ -1,5 +1,5 @@
 #!/bin/bash -eu
-# Copyright 2017 Google Inc.
+# Copyright 2021 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,4 +15,9 @@
 #
 ################################################################################
 
-bash tests/fuzz/oss-fuzz-build
+./autogen.sh
+./configure --without-pcre --enable-static
+make
+cd src
+$CC $CFLAGS -c $SRC/fuzz_burl.c -I. -I../include
+$CXX $CXXFLAGS $LIB_FUZZING_ENGINE fuzz_burl.o burl.o buffer.o base64.o -o $OUT/fuzz_burl

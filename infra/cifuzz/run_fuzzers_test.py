@@ -257,8 +257,10 @@ class CiFuzzTargetRunnerTest(fake_filesystem_unittest.TestCase):
     testcase = os.path.join(workspace, 'testcase')
     self.fs.create_file(testcase)
     stacktrace = b'stacktrace'
+    corpus_dir = 'corpus'
+    self.fs.create_dir(corpus_dir)
     mocked_run_fuzz_target.return_value = fuzz_target.FuzzResult(
-        testcase, stacktrace)
+        testcase, stacktrace, corpus_dir)
     magic_mock = mock.MagicMock()
     magic_mock.target_name = 'target1'
     mocked_create_fuzz_target_obj.return_value = magic_mock
@@ -296,6 +298,7 @@ class BatchFuzzTargetRunnerTest(fake_filesystem_unittest.TestCase):
     self.fs.create_file(testcase2)
     stacktrace = b'stacktrace'
     call_count = 0
+    corpus_dir = 'corpus'
 
     def mock_run_fuzz_target(_):
       nonlocal call_count
@@ -305,7 +308,8 @@ class BatchFuzzTargetRunnerTest(fake_filesystem_unittest.TestCase):
         testcase = testcase2
       assert call_count != 2
       call_count += 1
-      return fuzz_target.FuzzResult(testcase, stacktrace)
+      self.fs.create_dir(corpus_dir)
+      return fuzz_target.FuzzResult(testcase, stacktrace, corpus_dir)
 
     mocked_run_fuzz_target.side_effect = mock_run_fuzz_target
     magic_mock = mock.MagicMock()
